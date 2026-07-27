@@ -1,9 +1,13 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory
-# from files import readfile_write
+
+import sampledata
+from files import readfile_write
 import pandas as pd
 import uuid
 import os
 import openpyxl
+from sampledata import read_write
+
 app = Flask(__name__, template_folder='templates')
 
 # api
@@ -24,20 +28,8 @@ def receive_data():
     if request.method == 'POST':
         datafile = request.files["file"]
 
-        if datafile.filename.endswith(".xlsx"):
-
-            df = pd.read_excel(datafile)
-            if os.path.exists("./files") == False:
-                os.mkdir("./files")
-            filename = f'{uuid.uuid4()}.xlsx'
-            df.to_excel(os.path.join("./files/",filename))
-        elif datafile.filename.endswith(".csv"):
-            df = pd.read_csv(datafile)
-            if os.path.exists("./files") == False:
-                os.mkdir("./files")
-            filename = f'{uuid.uuid4()}.xlsx'
-            df.to_excel(os.path.join("./files/",filename))
-        filelist = []
+        readfile_write(datafile)
+        filelist = os.listdir(os.path.join("./files"))
         return render_template("index.html", filelist = filelist)
         # filelist = os.path.
 
@@ -51,7 +43,8 @@ def receive_data():
 @app.route("/add-data", methods=["GET","POST"])
 def add_data():
     filename = read_write()
-    return render_template("download.html", filename=filename)
+    return render_template("index.html", filelist = filename)
+    # return render_template("download.html", filename=filename)
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
     if request.method == 'GET':
