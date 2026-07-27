@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 
 
 
-engine = create_engine('sqlite:///Excettodb.db', echo=True)
+engine = create_engine('sqlite:///database.db')
 
 # conn = sqlite3.connect('Excettodb.db')
 
@@ -30,8 +30,8 @@ engine = create_engine('sqlite:///Excettodb.db', echo=True)
 
 
 
-def insert_data(df):
-    df.to_sql('data', con=engine, if_exists='append', index=False)
+def insert_data(df, tablename):
+    df.to_sql(tablename, con=engine, if_exists='append', index=False)
 
 
 # conn.commit()
