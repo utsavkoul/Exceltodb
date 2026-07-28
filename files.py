@@ -3,24 +3,28 @@ from pathlib import Path
 import os
 from database import insert_data
 import uuid
-def readfile_write(files):
-    for file in files:
+def readfile_write(file):
+    # for file in files:
         if file.filename.endswith(".xlsx"):
 
-            # df = pd.read_excel(datafile)
-            # if os.path.exists("./files") == False:
-            #     os.mkdir("./files")
+            df = pd.read_excel(file)
+            print(file.filename)
+            if os.path.exists("./files") == False:
+                os.mkdir("./files")
             # filename = f'{uuid.uuid4()}.xlsx'
-            # df.to_excel(os.path.join("./files/",filename))
-            file.save(os.path.join("./files/"))
+            df.to_excel(os.path.join("./files/",file.filename))
+            # file.save(os.path.join("./files"))
+            return True
         elif file.filename.endswith(".csv"):
             df = pd.read_csv(file)
             if os.path.exists("./files") == False:
                 os.mkdir("./files")
-            filename = f'{uuid.uuid4()}.xlsx'
+            filename = f'{file.filename}.xlsx'
             df.to_excel(os.path.join("./files/", filename))
+            return True
         else:
-            raise ValueError("Unsupported file format. Please provide a .xlsx or .csv file.")
+            # raise ValueError("Unsupported file format. Please provide a .xlsx or .csv file.")
+            return False
 
 
 

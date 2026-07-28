@@ -5,12 +5,23 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Upload Files</title>
+    <title>Upload file</title>
 </head>
 <body>
-<form method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv">
-</form>
+<form method="POST" action="{{ url_for("receive_data") }}" enctype="multipart/form-data">
+<input type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv">
+<button type="submit" value="file" >UPLOAD</button>
 
+<h1>{{ message }}</h1>
+    <button type="button" onclick="{{ (url_for("add_data")) }}" action="{{ url_for("add_data") }}" value="add_data">Add Data</button>
+<a href="{{ url_for("add_data") }}">Add Data</a>
+    <li>
+        <ul>
+            {% for file in filelist %}
+            <h1>{{ file }}</h1>
+            {% endfor %}
+        </ul>
+    </li>
+</form>
 </body>
 </html>

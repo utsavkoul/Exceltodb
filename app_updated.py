@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory
 
-import sampledata
+
 from files import readfile_write
 import pandas as pd
 import uuid
@@ -28,9 +28,12 @@ def receive_data():
     if request.method == 'POST':
         datafile = request.files["file"]
 
-        readfile_write(datafile)
-        filelist = os.listdir(os.path.join("./files"))
-        return render_template("index.html", filelist = filelist)
+        status = readfile_write(datafile)
+        filelist = os.listdir("./files")
+        if status:
+            return render_template("index.html", filelist = filelist)
+        else:
+            return render_template("index.html", message = "Please select .xlsx file")
         # filelist = os.path.
 
         # else:
@@ -42,8 +45,9 @@ def receive_data():
 
 @app.route("/add-data", methods=["GET","POST"])
 def add_data():
+    print("Adding Data")
     filename = read_write()
-    return render_template("index.html", filelist = filename)
+    return render_template("download.html", filelist = filename)
     # return render_template("download.html", filename=filename)
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
