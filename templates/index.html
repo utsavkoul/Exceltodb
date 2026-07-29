@@ -18,6 +18,7 @@
         h1{font-size:1.1rem;margin:0;color:var(--muted)}
         ul{padding-left:1rem}
     </style>
+
 </head>
 <body>
 <div class="card">
@@ -26,15 +27,34 @@
 <button type="submit" value="file" >UPLOAD</button>
 
 <h1>{{ message }}</h1>
-    <button type="button" onclick="{{ (url_for("add_data")) }}" action="{{ url_for("add_data") }}" value="add_data">Add Data</button>
-<a href="{{ url_for("add_data") }}">Add Data</a>
-    <li>
-        <ul>
+    <button type="button" id="button" value="add_data">Add Data</button>
+{#<a href="{{ url_for("add_data") }}">Add Data</a>#}
+    <ul>
+
             {% for file in filelist %}
+                <li>
             <h1>{{ file }}</h1>
+                </li>
             {% endfor %}
-        </ul>
-    </li>
+
+    </ul>
+  <script type="text/javascript">
+        const add_button= document.getElementById("button")
+
+        const Navigate = window.Navigation
+        console.log(Navigate)
+        add_button.addEventListener("click",()=>{
+            console.log("clicked")
+            fetch("{{ url_for("add_data") }}", {
+                method:"GET"
+            }).then(res=>console.log(res))
+                {#.then(()=>navigate("{{ url_for( "add_data")}}"))#}
+            window.location.href = "{{ url_for("add_data") }}"
+        })
+
+
+
+    </script>
 </form>
 </div>
 </body>

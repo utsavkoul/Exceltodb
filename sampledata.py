@@ -65,11 +65,14 @@ def read_write():
     # df_merge5 = df_merge3.to_string(index=False)
     # print(df_merge3)
     # print(df_merge3.drop( columns=df_merge3.iloc[]))
+    df_merge4 = df_merge3.drop_duplicates()
+    # print(df_merge3)
+
     # index = df_merge3['customer_id, customer_name,      city,  order_id,  order_date,  product_id, quantity, product_name,     category,                  remarks ']
     filename = "output.xlsx"
     # pr
-    df_merge3.to_excel(os.path.join("./output/",filename), index=False)
-    insert_data(df_merge3, "Full Table")
+    df_merge4.to_excel(os.path.join("./output/",filename), index=False)
+    insert_data(df_merge4, "Full Table")
     return filename
 
 # print(read_write())
