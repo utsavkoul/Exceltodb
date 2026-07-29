@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Upload file</title>
+    <style>
+        :root{--bg:#f6f9fc;--card:#fff;--accent:#0066cc;--accent-2:#005bb5;--muted:#6b7280}
+        *{box-sizing:border-box;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif}
+        body{margin:0;background:var(--bg);color:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+        .card{background:var(--card);padding:2rem;border-radius:12px;box-shadow:0 6px 20px rgba(16,24,40,0.08);width:100%;max-width:540px}
+        form{display:flex;flex-direction:column;gap:1rem}
+        input[type="file"]{padding:.6rem;border:1px dashed #d1d5db;border-radius:8px;background:#fbfdff}
+        button[type="submit"], button[type="button"], a.button{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff;border:none;padding:.6rem 1rem;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-block}
+        button[type="button"]{background:#e2e8f0;color:#111}
+        h1{font-size:1.1rem;margin:0;color:var(--muted)}
+        ul{padding-left:1rem}
+    </style>
+</head>
+<body>
+<div class="card">
+<form method="POST" action="{{ url_for("receive_data") }}" enctype="multipart/form-data">
+<input type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv">
+<button type="submit" value="file" >UPLOAD</button>
+
+<h1>{{ message }}</h1>
+    <button type="button" onclick="{{ (url_for("add_data")) }}" action="{{ url_for("add_data") }}" value="add_data">Add Data</button>
+<a href="{{ url_for("add_data") }}">Add Data</a>
+    <li>
+        <ul>
+            {% for file in filelist %}
+            <h1>{{ file }}</h1>
+            {% endfor %}
+        </ul>
+    </li>
+</form>
+</div>
+</body>
+</html>
