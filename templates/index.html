@@ -24,14 +24,19 @@
 <div class="card">
 <form method="POST" action="{{ url_for("receive_data") }}" enctype="multipart/form-data">
 <input type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv">
-<button type="submit" value="file" >UPLOAD</button>
+    <label >
+        <input type="text" placeholder="primary Key" name="primary_key">
+        <input type="text" placeholder="Column Name" name="column_name">
+
+    </label>
+    <button type="submit" value="file" >UPLOAD</button>
 
 <h1>{{ message }}</h1>
     <button type="button" id="button" value="add_data">Add Data</button>
 {#<a href="{{ url_for("add_data") }}">Add Data</a>#}
     <ul>
 
-            {% for file in filelist %}
+            {% for file in dictionary %}
                 <li>
             <h1>{{ file }}</h1>
                 </li>

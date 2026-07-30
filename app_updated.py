@@ -27,11 +27,14 @@ def index():
 def receive_data():
     if request.method == 'POST':
         datafile = request.files["file"]
+        primary_key = request.form["primary_key"]
+        column_name = request.form.get("column_name")
 
-        status = readfile_write(datafile)
+
+        files, status = readfile_write(datafile,column_name,primary_key)
         filelist = os.listdir("./files")
         if status:
-            return render_template("index.html", filelist = filelist)
+            return render_template("index.html", dictionary = files)
         else:
             return render_template("index.html", message = "Please select .xlsx file")
         # filelist = os.path.
