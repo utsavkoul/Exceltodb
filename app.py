@@ -17,7 +17,7 @@ app = Flask(__name__, template_folder='templates')
 @app.route("/", methods=['GET'])
 def index():
     if request.method == 'GET':
-        return render_template('index.html')
+        return render_template('index.html', dictionary={})
 #
 @app.route('/data', methods=['GET','POST'])
 def receive_data():

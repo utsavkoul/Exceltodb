@@ -21,7 +21,7 @@ app = Flask(__name__, template_folder='templates')
 @app.route("/", methods=['GET'])
 def index():
     if request.method == 'GET':
-        return render_template('index.html')
+        return render_template('index.html', dictionary={})
 #
 @app.route('/data', methods=['GET','POST'])
 def receive_data():
@@ -31,10 +31,10 @@ def receive_data():
         column_name = request.form.get("column_name")
 
 
-        files, status = readfile_write(datafile,column_name,primary_key)
+        dictionary, status = readfile_write(datafile,column_name,primary_key)
         filelist = os.listdir("./files")
         if status:
-            return render_template("index.html", dictionary = files)
+            return render_template("index.html", dictionary = dictionary or {})
         else:
             return render_template("index.html", message = "Please select .xlsx file")
         # filelist = os.path.
@@ -48,10 +48,17 @@ def receive_data():
 
 @app.route("/add-data", methods=["GET","POST"])
 def add_data():
-    print("Adding Data")
-    filename = read_write()
-    return render_template("download.html", filelist = filename)
-    # return render_template("download.html", filename=filename)
+        data = request.json['data']
+        print("Add_Data")
+        print("Adding Data")
+        print("data",data)
+        # if os.
+        filename = read_write(data)
+        print(filename)
+        return render_template("download.html", filelist = filename )
+    # else:
+    #
+    #     return render_template("download.html", filename=filename)
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
     if request.method == 'GET':

@@ -1,4 +1,6 @@
 import os
+from functools import reduce
+
 # from itertools import count
 #
 #
@@ -22,7 +24,7 @@ from database import insert_data, get_data
 # #
 # # insert_data(df4, "products")
 #
-def read_write():
+def read_write(data):
     # list = os.listdir(os.path.join("./sample"))
     dic = {
 
@@ -32,12 +34,14 @@ def read_write():
     #     for file in entries:
     #         dic["df"+str(count)] = pd.read_excel(file)
     #         count = count + 1
-    arr = get_data()
+    arr = data
+    print(arr)
     # arr =[('./files/customers.xlsx', 'customer_id', 'customer_id'), ('./files/orders.xlsx', 'customer_id', 'order_id'), ('./files/order_items.xlsx', 'order_id', 'product_id'), ('./files/products.xlsx', 'product_id', 'product_id')]
     merge =[]
-    for file in arr:
+    for file in arr.values():
         dic['df'+str(count)] = [pd.read_excel(file[0]), file[1], file[2]]
         count +=1
+    # dic = arr
 
     # print(dic)
     main_data = dic['df0']
@@ -46,7 +50,7 @@ def read_write():
     count = 0
     for value in dic.keys():
         print(value)
-        merge_df[0] = merge_df[0].merge(dic[value][0], left_on=main_data[2], right_on=dic[value][1], how="outer", suffixes=("_x", "_y") )
+        merge_df[0] = merge_df[0].merge(dic[value][0], left_on=main_data[2], right_on=dic[value][1], how="outer", suffixes=("_x", "_y"))
         # merge_df[0].set_index('customer_id', inplace=True)
         merge_df[0].rename(columns={'Unnamed: 0': 'new_index_name_'+str(count)}, inplace=True)
 
@@ -58,7 +62,13 @@ def read_write():
 
     pd.set_option('display.max_columns', 20)
     print(merge_df)
-#
+
+
+#     list = [dic['df0'],dic['df1']]
+#     print('Data \n',dic.values())
+#     df = reduce(lambda left, right : pd.merge(left[0][0], right[0][0], left_on=left[0][2], right_on=right[0][1] ,how='outer'), dic.values())
+#     print("dataframe \n",df)
+# #
 #
 #     # dic={
 #     #     'df0': pd.read_excel("./sample/customers.xlsx"),
@@ -104,10 +114,10 @@ def read_write():
 #     # pr
     df_cleaned.drop_duplicates()
     df_cleaned.to_excel(os.path.join("./output/",filename), index=False)
-    insert_data(df_cleaned, "Full Table 1")
+    insert_data(df_cleaned, "Full Table 6")
     return filename
 #
-read_write()
+# read_write(data)
 # # print(read_write())
 #
 # #

@@ -6,12 +6,12 @@ import uuid
 from database import insert_dictionary
 
 dictionary = {
-            'fe298e06-1ccc-4a47-8f35-9c99a3518ece': {'./files/orders.xlsx':'orders_id'},
-        }
-def readfile_write(file, column_name, primary_key, dictionary=dictionary):
-    # for file in files:
-        count = 0
 
+        }
+count = 0
+def readfile_write(file, column_name, primary_key, dictionary=dictionary ,count = count):
+    # for file in files:
+    #     count = 0
 
         if file.filename.endswith(".xlsx"):
 
@@ -23,10 +23,13 @@ def readfile_write(file, column_name, primary_key, dictionary=dictionary):
             df.to_excel(os.path.join("./files/",file.filename))
             # file.save(os.path.join("./files"))
             # dictionary["file2"] ={os.path.join("./files/", file.filename): column_name}
-            files = insert_dictionary([os.path.join("./files/", file.filename), column_name, primary_key])
-            print(files)
+            # files = insert_dictionary([os.path.join("./files/", file.filename), column_name, primary_key])
+            dictionary['df'+str(count)] = [os.path.join("./files/", file.filename), column_name, primary_key]
+            count += 1
 
-            return files, True
+            print("File Dictionary",dictionary)
+
+            return dictionary, True
         elif file.filename.endswith(".csv"):
             df = pd.read_csv(file)
             if os.path.exists("./files") == False:
@@ -34,9 +37,10 @@ def readfile_write(file, column_name, primary_key, dictionary=dictionary):
             filename = f'{file.filename}.xlsx'
             df.to_excel(os.path.join("./files/", filename))
             # dictionary[str(uuid.uuid4())] = [os.path.join("./files/", file.filename), column_name]
-            files = insert_dictionary([os.path.join("./files/", file.filename), column_name, primary_key])
-
-            return files, True
+            # files = insert_dictionary([os.path.join("./files/", file.filename), column_name, primary_key])
+            dictionary['df'+str(count)] = [os.path.join("./files/", file.filename), column_name, primary_key]
+            return dictionary, True
+            count += 1
         else:
             # raise ValueError("Unsupported file format. Please provide a .xlsx or .csv file.")
             return False

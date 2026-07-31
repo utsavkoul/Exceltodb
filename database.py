@@ -20,6 +20,10 @@ engine = create_engine('sqlite:///database.db')
 def insert_data(df, tablename):
     df.to_sql(tablename, con=engine, if_exists='append', index=False)
 
+
+
+
+
 def insert_dictionary(dictionary_list):
 
     # column_names = ','.join(dictionary.keys())
