@@ -1,0 +1,63 @@
+{% extends 'base.html'%}
+<body>
+{% block content %}
+<div class="card grid " style="width: 600.8px;display: flex;">
+    <div class="card-body g-col-2" style="width: 450px; display: inline;"><h4 class="card-title">FILE</h4>
+        <div class="form-group" style=""><label>Text</label><input type="text" class="form-control">
+            <div class="form-group" style=""><label>Merge Table Columns</label><select class="form-control">
+                <option value="value1">Text 1</option>
+                <option value="value2">Text 2</option>
+                <option value="value3">Text 3</option>
+            </select>
+                <div class="form-group" style=""><label>New Table Columns</label><select class="form-control">
+                    <option value="value1">Text 1</option>
+                    <option value="value2">Text 2</option>
+                    <option value="value3">Text 3</option>
+                </select></div>
+            </div>
+        </div>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+        <button type="button" class="btn btn-primary" style="">Primary</button>
+    </div>
+</div>
+
+<!-- /container -->
+
+
+<div class="card" style="width: 600.8px;">
+    <div class="card-body g-col-2" style="width: 450px; display: inline;"><h4 class="card-title">Table</h4>
+        <table class="table " style="">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Username</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>Mark</td>
+                <td>Otto</td>
+                <td>@mdo</td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>Jacob</td>
+                <td>Thornton</td>
+                <td>@fat</td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td>Larry</td>
+                <td>the Bird</td>
+                <td>@twitter</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+</body>
+</html>

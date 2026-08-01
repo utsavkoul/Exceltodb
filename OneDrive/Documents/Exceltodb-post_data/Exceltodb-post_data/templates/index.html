@@ -1,0 +1,57 @@
+{%  extends 'base.html' %}
+{% block content %}
+
+<!--Add css to the html-->
+<form method="POST" action="{{url_for("receive_data")}}" enctype="multipart/form-data">
+<label >Add File</label>
+<input type="file" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv">
+<!--    <label >-->
+<!--        <input type="text" placeholder="primary Key" name="primary_key">-->
+<!--        <input type="text" placeholder="Column Name" name="column_name">-->
+
+<!--    </label>-->
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Merge Table DropDown button
+  </button>
+  <ul class="dropdown-menu">
+      { % for column_name in dictionary %}
+
+    <li><a class="dropdown-item" href="#">{{column_name}}</a></li>
+      { % endfor %}
+  </ul>
+</div>
+
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    New Table DropDown button
+  </button>
+  <ul class="dropdown-menu">
+      {% for new in new_table %}
+    <li><a class="dropdown-item" href="#">{{new}}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+    <button type="submit" value="file" class="btn btn-primary">UPLOAD</button>
+
+<h1>{{ message }}</h1>
+{#<a href="{{ url_for("add_data") }}">Add Data</a>#}
+    <ul>
+     {%  if dictionary != None %}
+            {% for file in dictionary %}
+                <li>
+            <h1>{{ file }}</h1>
+                </li>
+            {% endfor %}
+         {%  else %}
+         {% set dictionary ={} %}
+
+    {% endif %}
+
+    </ul>
+
+
+    <button type="button" id="button" value="add_data" class="btn btn-primary">Add Data</button>
+
+</form>
+{% endblock %}
