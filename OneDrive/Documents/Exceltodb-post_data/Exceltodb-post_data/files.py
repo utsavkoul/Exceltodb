@@ -9,7 +9,7 @@ dictionary = {
 
         }
 count = 0
-def readfile_write(file, dictionary=dictionary ,count = count):
+def readfile_write(file):
     # for file in files:
     #     count = 0
 
@@ -22,10 +22,13 @@ def readfile_write(file, dictionary=dictionary ,count = count):
             # filename = f'{uuid.uuid4()}.xlsx'
             df.to_excel(os.path.join("./files/",file.filename))
 
-            #Create a merged table
 
-            merged_df = read_write(df)
-            new_table = df
+            # Create the column mapping and pass the column mapping
+            # columns = [[column1],[column2]]
+            # #Create a merged table
+            #
+            # merged_df, filename = read_write(df, columns)
+            # new_table = df
             #Return the merged df table
 
             # file.save(os.path.join("./files"))
@@ -34,35 +37,43 @@ def readfile_write(file, dictionary=dictionary ,count = count):
 
             #Store the table column mapping from the merged table to the new table
 
-            dictionary['df'+str(count)] = [os.path.join("./files/", file.filename), column_name, primary_key]
-            count += 1
+            # dictionary['df'+str(count)] = [os.path.join("./files/", file.filename), column_name, primary_key]
+            # count += 1
             #Return the new file columns or table view
-            print("File Dictionary",dictionary)
+            # print("File Dictionary",dictionary)
 
-            return merged_df, new_table, True
+            return df, True
         elif file.filename.endswith(".csv"):
             df = pd.read_csv(file)
             if os.path.exists("./files") == False:
                 os.mkdir("./files")
-            filename = f'{file.filename}.xlsx'
-            df.to_excel(os.path.join("./files/", filename))
+            # filename = f'{file.filename}.xlsx'
+            df.to_excel(os.path.join("./files/", file.filename))
             # dictionary[str(uuid.uuid4())] = [os.path.join("./files/", file.filename), column_name]
             # files = insert_dictionary([os.path.join("./files/", file.filename), column_name, primary_key])
-
-            # Create a merged table
-
-            merged_df = read_write(df)
+            # Column mapping
+            # columns = [[column1],[column2]]
+            #
+            # # Create a merged table
+            #
+            # merged_df, filename = read_write(df, columns)
             new_table = df
             # Return the merged df table
             #Store the table column mapping
-            dictionary['df'+str(count)] = [os.path.join("./files/", file.filename), column_name, primary_key]
-            return merged_df, new_table, True
+            # dictionary['df'+str(count)] = [os.path.join("./files/", file.filename), column_name, primary_key]
+            return df, True
             count += 1
         else:
             # raise ValueError("Unsupported file format. Please provide a .xlsx or .csv file.")
             return False
 
-
+def merge_file(new_file, column_mappings):
+    # df = readfile_write(new_file)
+    merged_df, filename = read_write(new_file)
+    return merged_df, filename
+def create_first_output():
+    df = pd.DataFrame(['product_id'])
+    df.to_excel(os.path.join("./output", "output.xlsx"))
 
 # def writefile(data):
 #     file_path = os.path.join("C:\\Users\\hyped\\OneDrive\\Documents\\Excettodb\\", "output.xlsx")

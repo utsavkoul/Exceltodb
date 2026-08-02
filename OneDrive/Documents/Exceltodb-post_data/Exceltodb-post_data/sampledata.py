@@ -24,37 +24,48 @@ from database import insert_data, get_data
 # #
 # # insert_data(df4, "products")
 #Data frame and new and merged table columns mapping
-def read_write(data, column_mapping):
+column_mapping = [[''],['']]
+def read_write(data):
     # list = os.listdir(os.path.join("./sample"))
-    dic = {
-
-    }
-    count = 0
+    # dic = {
+    #
+    # }
+    # count = 0
     # with os.scandir("./files") as entries:
     #     for file in entries:
     #         dic["df"+str(count)] = pd.read_excel(file)
     #         count = count + 1
-    arr = data
-    print(arr)
+    # arr = data
+    # print(arr)
     # arr =[('./files/customers.xlsx', 'customer_id', 'customer_id'), ('./files/orders.xlsx', 'customer_id', 'order_id'), ('./files/order_items.xlsx', 'order_id', 'product_id'), ('./files/products.xlsx', 'product_id', 'product_id')]
     merge =[]
-    for file in arr.values():
-        dic['df'+str(count)] = [pd.read_excel(file[0]), file[1], file[2]]
-        count +=1
+    # for file in arr.values():
+    #     dic['df'+str(count)] = [pd.read_excel(file[0]), file[1], file[2]]
+    #     count +=1
     # dic = arr
     # Merge df and create a merged table
-    merged_df = pd.DataFrame([])
-    merged_df = pd.merge(data, merged_df, left_on='', right_on='', how='outer' )
+    # merged_df = pd.DataFrame(['id'])
+    # Concat tables
+    merged_df = pd.read_excel(os.path.join("./output",'output.xlsx'))
+    column_mappings = [[''],['']]
+    print("data",data)
+    print("Merged Data",merged_df)
+    # Fix the on parameter in the merge method
+    # print(column_mappings[0].count('') == 1)
+    if column_mappings[0].count('') <= 1:
+        merged_df = merged_df.merge(data, on="product_id")
+    else:
+        merged_df = pd.merge(data, merged_df, left_on=column_mappings[0] , right_on=column_mappings[1], how='outer' )
     # print(dic)
-    main_data = dic['df0']
-    merge_df = {0:main_data[0]}
+    # main_data = dic['df0']
+    # merge_df = {0:main_data[0]}
     # print(main_data)
-    count = 0
-    for value in dic.keys():
-        print(value)
-        merge_df[0] = merge_df[0].merge(dic[value][0], left_on=main_data[2], right_on=dic[value][1], how="outer", suffixes=("_x", "_y"))
-        # merge_df[0].set_index('customer_id', inplace=True)
-        merge_df[0].rename(columns={'Unnamed: 0': 'new_index_name_'+str(count)}, inplace=True)
+    # count = 0
+    # for value in dic.keys():
+    #     print(value)
+    #     merge_df[0] = merge_df[0].merge(dic[value][0], left_on=main_data[2], right_on=dic[value][1], how="outer", suffixes=("_x", "_y"))
+    #     # merge_df[0].set_index('customer_id', inplace=True)
+    #     merge_df[0].rename(columns={'Unnamed: 0': 'new_index_name_'+str(count)}, inplace=True)
 
         # merge.append(merge_df)
 
@@ -63,7 +74,7 @@ def read_write(data, column_mapping):
         # main_data[2] = dic['df1'][2]
 
     pd.set_option('display.max_columns', 20)
-    print(merge_df)
+    print("Merged Data \n",merged_df)
 
 
 #     list = [dic['df0'],dic['df1']]
@@ -111,14 +122,18 @@ def read_write(data, column_mapping):
 #     # # print(df_merge3)
 #
 #     # index = df_merge3['customer_id, customer_name,      city,  order_id,  order_date,  product_id, quantity, product_name,     category,                  remarks ']
-    df_cleaned = merged_df[0].loc[:, ~merge_df[0].columns.duplicated()]
+#     df_cleaned = merged_df[0].loc[:, ~merged_df[0].columns.duplicated()]
     filename = "output.xlsx"
 #     # pr
-    df_cleaned.drop_duplicates()
-    df_cleaned.to_excel(os.path.join("./output/",filename), index=False)
-    insert_data(df_cleaned, "Full Table 6")
+#     df_cleaned.drop_duplicates()
+#     df_cleaned.to_excel(os.path.join("./output/",filename), index=False)
+    merged_df.to_excel(os.path.join("./output/",filename), index=False)
+
+    insert_data(merged_df, "Full Table 8")
     return merged_df, filename
 #
+# data = pd.read_excel(os.path.join("./files", 'products.xlsx'))
+# print(read_write(data))
 # read_write(data)
 # # print(read_write())
 #

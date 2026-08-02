@@ -1,12 +1,12 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory, Response, redirect, url_for
 
-from files import readfile_write
+from files import readfile_write, create_first_output
 import pandas as pd
 import uuid
 import os
 import openpyxl
 from sampledata import read_write
-
+from files import merge_file
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/')
 
 # api
@@ -30,17 +30,21 @@ def receive_data():
         # column_name = request.form.get("column_name")
 
         #Return All column names or table view
-        #Create the merged table when the button is clicked
-        # merged_df, new_table, status = readfile_write(datafile)
-        new_table_df = pd.read_excel(datafile)
+        #Upload a file and Create the merged table when the button is clicked
+        # merged_df, filename, status = readfile_write(datafile)
+        # merged_df_columns = merged_df.columns.tolist()
+        #Create output file when call the merge for the first time
+        create_first_output()
+        new_table_df, status = readfile_write(datafile)
+        # new_table_df = pd.read_excel(datafile)
         new_table = new_table_df.columns.tolist()
         print("New Table Columns",new_table)
-        status = True
+        # status = True
         # second time return columns of the previous merged table and new table
         if status:
-            return render_template("index.html", new_table = new_table or {})
+            return render_template("indexlayout.html", new_table = new_table or {}, new_table_df=new_table_df)
         else:
-            return render_template("index.html", message = "Please select .xlsx file")
+            return render_template("indexlayout.html", message = "Please select .xlsx file")
         # filelist = os.path.
 
         # else:
@@ -50,8 +54,9 @@ def receive_data():
     # Process the received data
 
 #Merge files when add button clicked on the html page
-@app.route("/add-data", methods=["GET"])
-def add_data():
+@app.route("/merge-data", methods=["GET","POST"])
+def merge_data():
+    if request.method == 'POST':
         # data = request.json['data']
         # print("Add_Data")
         # print("Adding Data")
@@ -59,13 +64,34 @@ def add_data():
         # # if os.
         # filename = read_write(data)
         # print(filename)
-        return redirect(url_for("download_output_file"))
+
+        columns = request.json['columns']
+        new_table = request.json['new_table']
+        merged_table = request.json['merged_table']
+        data = request.json
+        print("Request values",data,columns,new_table,merged_table)
+        new_table = pd.read_excel('./files/products.xlsx')
+        new_table = new_table.drop(columns=['Unnamed: 0'])
+        # Convert df to file
+        # new_table_file = new_table.to_excel("./files")
+        merged_df, filename = merge_file(new_table, columns)
+        #Save Excel file when merged to download
+        return render_template('indexlayout.html', merged_df=merged_df, filename=filename or {})
         return render_template("download.html", filelist = filename )
-    # else:
-    #
-    #     return render_template("download.html", filename=filename)
+    else:
 
+        return render_template("<h1>Please Post the Files</h1>")
 
+# @app.route("/add-data", methods=["GET"])
+# def add_data():
+#         # data = request.json['data']
+#         # print("Add_Data")
+#         # print("Adding Data")
+#         # print("data",data)
+#         # # if os.
+#         # filename = read_write(data)
+#         # print(filename)
+#         return redirect(url_for("download_output_file"))
 # Can return Json response
 # @app.route('/download/<filename>', methods=['GET'])
 # def download_file(filename):

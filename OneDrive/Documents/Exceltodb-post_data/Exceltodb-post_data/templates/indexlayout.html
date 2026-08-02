@@ -2,28 +2,68 @@
 <body>
 {% block content %}
 <div class="card grid " style="width: 600.8px;display: flex;">
-    <div class="card-body g-col-2" style="width: 450px; display: inline;"><h4 class="card-title">FILE</h4>
-        <div class="form-group" style=""><label>Text</label><input type="text" class="form-control">
+    <div class="card-body g-col-2" style="width: 450px; display: inline;">
+
+        <h4 class="card-title">FILE</h4>
+        <div class="form-group" >
+            <form method="POST" action="{{url_for("receive_data")}}" enctype="multipart/form-data" >
+            <div>
+            <label>Upload File</label><input type="file" class="form-control" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv">
             <div class="form-group" style=""><label>Merge Table Columns</label><select class="form-control">
-                <option value="value1">Text 1</option>
-                <option value="value2">Text 2</option>
-                <option value="value3">Text 3</option>
+                {% for column in dictionary%}
+                <option value="value1">{{ column }}</option>
+                {% endfor %}
             </select>
-                <div class="form-group" style=""><label>New Table Columns</label><select class="form-control">
-                    <option value="value1">Text 1</option>
-                    <option value="value2">Text 2</option>
-                    <option value="value3">Text 3</option>
-                </select></div>
             </div>
+                <div class="form-group"><label>New Table Columns</label><select class="form-control">
+                    {% for column in new_table %}
+                    <option value="value1">{{ column }}</option>
+                    {% endfor %}
+                </select>
+                </div>
+                </div>
+            <button href="{{ url_for('receive_data')}}" type="submit" class="btn btn-primary" >Upload</button>
+
+            </form>
+            </div>
+
+
         </div>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
-        <button type="button" class="btn btn-primary" style="">Primary</button>
-    </div>
+
+
+        <button type="button" class="btn btn-primary" id="merge_button" style="">Merge Table</button>
 </div>
+<script>
+
+    const merge_button = document.getElementById("merge_button");
+    merge_button.addEventListener('click', ()=>{
+        console.log("clicked")
+        fetch("{{url_for('merge_data')}}",{
+                method:"POST",
+                headers:{
+                    "Content-Type": "application/json; charset=utf-8",
+                },
+                body:JSON.stringify({merged_table: {}
+                ,new_table: {new_table_df},
+                columns:{}})
+            }).then(res=>console.log(res))
+            // Return the merged table and add to the document id and pass as post to merge table again
+
+        })
+
+
+
+
+
+
+
+
+
+</script>
 
 <!-- /container -->
 
-
+<!-- Add excel grid component-->
 <div class="card" style="width: 600.8px;">
     <div class="card-body g-col-2" style="width: 450px; display: inline;"><h4 class="card-title">Table</h4>
         <table class="table " style="">
@@ -60,4 +100,3 @@
 </div>
 {% endblock %}
 </body>
-</html>
