@@ -69,10 +69,10 @@ def readfile_write(file):
 
 def merge_file(new_file, column_mappings):
     # df = readfile_write(new_file)
-    merged_df, filename = read_write(new_file)
+    merged_df, filename = read_write(new_file, column_mappings)
     return merged_df, filename
 def create_first_output():
-    df = pd.DataFrame(['product_id'])
+    df = pd.DataFrame([], columns=['product_id'])
     df.to_excel(os.path.join("./output", "output.xlsx"))
 
 # def writefile(data):

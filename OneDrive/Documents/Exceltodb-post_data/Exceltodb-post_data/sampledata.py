@@ -6,7 +6,7 @@ from functools import reduce
 #
 import pandas as pd
 # from pandas.core.interchange import column
-
+import json
 from database import insert_data, get_data
 #
 # # df1 = pd.read_excel("./sample/customers.xlsx")
@@ -25,7 +25,7 @@ from database import insert_data, get_data
 # # insert_data(df4, "products")
 #Data frame and new and merged table columns mapping
 column_mapping = [[''],['']]
-def read_write(data):
+def read_write(data, column_mapping=column_mapping):
     # list = os.listdir(os.path.join("./sample"))
     # dic = {
     #
@@ -48,12 +48,15 @@ def read_write(data):
     # Concat tables
     merged_df = pd.read_excel(os.path.join("./output",'output.xlsx'))
     column_mappings = [[''],['']]
-    print("data",data)
+    data = json.loads(data)
+    print("data",type(data))
+    data_df = pd.DataFrame(data)
+    print("Data Df", data_df)
     print("Merged Data",merged_df)
     # Fix the on parameter in the merge method
     # print(column_mappings[0].count('') == 1)
     if column_mappings[0].count('') <= 1:
-        merged_df = merged_df.merge(data, on="product_id")
+        merged_df = merged_df.merge(data_df, on="product_id")
     else:
         merged_df = pd.merge(data, merged_df, left_on=column_mappings[0] , right_on=column_mappings[1], how='outer' )
     # print(dic)
@@ -129,7 +132,7 @@ def read_write(data):
 #     df_cleaned.to_excel(os.path.join("./output/",filename), index=False)
     merged_df.to_excel(os.path.join("./output/",filename), index=False)
 
-    insert_data(merged_df, "Full Table 8")
+    insert_data(merged_df, "Full Table new")
     return merged_df, filename
 #
 # data = pd.read_excel(os.path.join("./files", 'products.xlsx'))
