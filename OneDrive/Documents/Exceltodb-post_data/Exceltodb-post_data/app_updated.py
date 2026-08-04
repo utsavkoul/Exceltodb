@@ -15,12 +15,19 @@ app = Flask(__name__, template_folder='templates', static_folder='static', stati
 # download page *
 # analytic
 # row id *
-
+# Check json values according to columns and rows
+# Remove extra unnamed indexes
 
 @app.route("/", methods=['GET'])
 def index():
     if request.method == 'GET':
-        return render_template('indexlayout.html', dictionary={}, new_table_df={})
+        # get data for merged table
+        # Gwt data m db
+        if os.path.isfile("./output/output.xlsx") == False:
+            create_first_output()
+        merge_table_df = pd.read_excel(os.path.join("./output", "output.xlsx"))
+        merge_table_df = merge_table_df.to_dict()
+        return render_template('indexlayout.html', merge_table_df=merge_table_df, new_table_df={})
 # Add the column wise table view for each file
 @app.route('/data', methods=['GET','POST'])
 def receive_data():
@@ -34,19 +41,20 @@ def receive_data():
         # merged_df, filename, status = readfile_write(datafile)
         # merged_df_columns = merged_df.columns.tolist()
         #Create output file when call the merge for the first time
-        create_first_output()
+
         new_table_df, status = readfile_write(datafile)
         # new_table_df = pd.read_excel(datafile)
         new_table = new_table_df.columns.tolist()
         print("New Table Columns",new_table)
         table_json = new_table_df.to_dict()
         print("New table json",table_json)
-        merge_table_columns = pd.read_excel(os.path.join("./output", "output.xlsx")).columns.tolist()
+        merge_table_df = pd.read_excel(os.path.join("./output", "output.xlsx"))
+        merge_table_columns = merge_table_df.columns.tolist()
         print("Merged Table Columns",merge_table_columns)
         # status = True
         # second time return columns of the previous merged table and new table
         if status:
-            return render_template("indexlayout.html", new_table = new_table or {}, new_table_df=table_json, merged_table_columns=merge_table_columns)
+            return render_template("indexlayout.html", new_table = new_table or {}, new_table_df=table_json, merged_table_columns=merge_table_columns, merge_table_df=merge_table_df.to_dict())
         else:
             return render_template("indexlayout.html", message = "Please select .xlsx file")
         # filelist = os.path.
@@ -69,15 +77,17 @@ def merge_data():
         # filename = read_write(data)
         # print(filename)
         #
-        columns = request.json['columns']
+        columns_new = request.json['columns_new']
+        columns_merge = request.json['columns_merge']
         new_table = request.json['new_table']
         # # merged_table = request.json['merged_table']
         data = request.json
-        print("Request values",data,columns,new_table)
+        print("Request values",columns_new, columns_merge,new_table)
         # # new_table = pd.read_excel('./files/products.xlsx')
         # # new_table = new_table.drop(columns=['Unnamed: 0'])
         # # Convert df to file
         # new_table_file = new_table.to_excel("./files")
+        columns = [[columns_new],[columns_merge]]
         merged_df, filename = merge_file(new_table, columns)
         #Save Excel file when merged to download
         # merged_df = pd.read_excel("./files/products.xlsx")

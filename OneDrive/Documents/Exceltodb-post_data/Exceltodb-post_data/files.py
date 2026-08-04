@@ -72,8 +72,9 @@ def merge_file(new_file, column_mappings):
     merged_df, filename = read_write(new_file, column_mappings)
     return merged_df, filename
 def create_first_output():
-    df = pd.DataFrame([], columns=['product_id'])
+    df = pd.DataFrame([])
     df.to_excel(os.path.join("./output", "output.xlsx"))
+    print("output file created")
 
 # def writefile(data):
 #     file_path = os.path.join("C:\\Users\\hyped\\OneDrive\\Documents\\Excettodb\\", "output.xlsx")

@@ -25,7 +25,7 @@ from database import insert_data, get_data
 # # insert_data(df4, "products")
 #Data frame and new and merged table columns mapping
 column_mapping = [[''],['']]
-def read_write(data, column_mapping=column_mapping):
+def read_write(data, columns_mapping=column_mapping):
     # list = os.listdir(os.path.join("./sample"))
     # dic = {
     #
@@ -48,6 +48,7 @@ def read_write(data, column_mapping=column_mapping):
     # Concat tables
     merged_df = pd.read_excel(os.path.join("./output",'output.xlsx'))
     column_mappings = [[''],['']]
+    print("Data Type", type(data))
     data = json.loads(data)
     print("data",type(data))
     data_df = pd.DataFrame(data)
@@ -55,10 +56,14 @@ def read_write(data, column_mapping=column_mapping):
     print("Merged Data",merged_df)
     # Fix the on parameter in the merge method
     # print(column_mappings[0].count('') == 1)
-    if column_mappings[0].count('') <= 1:
-        merged_df = merged_df.merge(data_df, on="product_id")
+    # if column_mappings[0].count('') <= 1:
+    #     merged_df = merged_df.merge(data_df, on="product_id")
+    # else:
+    print(merged_df.empty)
+    if merged_df.empty == True:
+        merged_df = pd.concat([merged_df,data_df])
     else:
-        merged_df = pd.merge(data, merged_df, left_on=column_mappings[0] , right_on=column_mappings[1], how='outer' )
+        merged_df = pd.merge(data_df, merged_df, left_on=column_mappings[0] , right_on=column_mappings[1], how='outer' )
     # print(dic)
     # main_data = dic['df0']
     # merge_df = {0:main_data[0]}
@@ -132,7 +137,7 @@ def read_write(data, column_mapping=column_mapping):
 #     df_cleaned.to_excel(os.path.join("./output/",filename), index=False)
     merged_df.to_excel(os.path.join("./output/",filename), index=False)
 
-    insert_data(merged_df, "Full Table new")
+    insert_data(merged_df, "Full Table final test 1")
     return merged_df, filename
 #
 # data = pd.read_excel(os.path.join("./files", 'products.xlsx'))

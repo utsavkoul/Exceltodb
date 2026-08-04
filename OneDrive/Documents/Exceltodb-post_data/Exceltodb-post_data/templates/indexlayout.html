@@ -30,9 +30,6 @@
 
 
         </div>
-
-
-
 </div>
 
 <!-- /container -->
@@ -71,6 +68,7 @@
 <!--            </tbody>-->
 <!--        </table>-->
         <div id="app"></div>
+
     </div>
 </div>
 <div class="card" style="width: 600.8px;">
@@ -78,47 +76,102 @@
         <div id="app1"></div>
     </div>
 </div>
+
+<div class="card" style="width: 600.8px;">
+    <div class="card-body g-col-2" style="width: 450px; display: inline;"><h4 class="card-title">Table</h4>
+        <div id="gridjs"></div>
+    </div>
+</div>
+
 <script>
-    console.log({{new_table_df | tojson}});
+    console.log(decodeURIComponent());
+const rawString = '{{merge_table_df | tojson}}'
+
+// 2. Fix single quotes to double quotes so JSON.parse can read it
+
+
+// 3. Parse the string into a temporary working object
+const parsedData = JSON.parse(String(rawString));
+console.log("Parsed Data",parsedData)
+
+// 4. Map the data into a clean array of dictionary objects
+const finalDictionaryArray = Object.keys(parsedData.customer_id).map(index => {
+  return {
+    customer_id: parsedData.customer_id[index],
+    customer_name: parsedData.customer_name[index],
+    city: parsedData.city[index]
+  };
+});
+
+console.log(finalDictionaryArray);
     const rows = Object.values({{new_table_df | tojson}});
-    const app_new_table = document.getElementById('app');
-    const gridElement_new_table = document.createElement('div');
-    const grid_new_table = canvasDatagrid({
-      parentNode: gridElement_new_table,
-        data:rows
+    /**
+ * Automatically converts any pandas-style string into a custom dictionary.
+ * @param {string} stringData - The raw string input.
+ * @param {string} keyField - The column name you want to use as your dictionary key.
+ * @returns {Object} A dynamic custom dictionary.
+ */
+function toDynamicDictionary(stringData, keyField) {
+  // 1. Convert python single quotes to valid JSON double quotes
+  const parsedData = JSON.parse(String(stringData));
+
+  // 2. Identify all available columns/fields in the data dynamically
+  const columns = Object.keys(parsedData);
+
+  // 3. Fallback to find the first available column's row indexes
+  const sampleColumn = columns[0];
+  if (!sampleColumn) return {};
+  const rowIndexes = Object.keys(parsedData[sampleColumn]);
+
+  const customDict = {};
+
+  // 4. Map rows dynamically without hardcoded field names
+  rowIndexes.forEach(index => {
+    // Pick the value to use as our main dictionary key
+    const primaryKey = parsedData[keyField] ? parsedData[keyField][index] : index;
+
+    const rowData = {};
+    columns.forEach(col => {
+      rowData[col] = parsedData[col][index];
     });
-    grid_new_table.style.height = '300px';
-    grid_new_table.style.width = '100%';
+
+    customDict[primaryKey] = rowData;
+  });
+
+  return customDict;
+}
+const new_table = toDynamicDictionary('{{new_table_df | tojson}}',"customer_id")
+    console.log(new_table)
+
+    // const app_new_table = document.getElementById('app');
+    // const gridElement_new_table = document.createElement('div');
+    // const grid_new_table = canvasDatagrid({
+    //   parentNode: gridElement_new_table,
+    //     data:new_table
+    // });
+    // grid_new_table.style.height = '300px';
+    // grid_new_table.style.width = '100%';
 
     const app_merge_table = document.getElementById('app1');
     const gridElement_merge_table = document.createElement('div');
-    const grid_merge_table = canvasDatagrid({
-      parentNode: gridElement_merge_table,
-    });
-     grid_merge_table.style.height = '300px';
-    grid_merge_table.style.width = '100%';
-    const merge_button = document.getElementById("merge_button");
-    merge_button.addEventListener('click', async ()=>{
-        console.log("clicked")
-        const response = await fetch("{{url_for('merge_data')}}",{
-                method:"POST",
-                headers:{
-                    "Content-Type": "application/json; charset=utf-8",
-                },
-                body:JSON.stringify({
-                new_table: '{{new_table_df | tojson}}',
-                columns:{}})
-            })
-            // console.log((await response.arrayBuffer().byteLength))
-            const data = (await response.json());
-            console.log(data)
-            // console.log(XLSX)
-            grid_merge_table.data = Object.values(data)
-            // const workbook = XLSX.read(data);
-            // const worksheet = workbook.Sheets[workbook.sheetNames[0]]
-            // const merge_sheet_data = XLSX.utils.sheet_to_json(worksheet)
-            // console.log(merge_sheet_data)
-        })
+    // normalize server data into an array of row objects
+    const _merge_raw = decodeURIComponent({{merge_table_df | tojson}}) || [];
+    const _merge_rows = Array.isArray(_merge_raw) ? _merge_raw : Object.values(_merge_raw);
+    // const grid_merge_table = canvasDatagrid({
+    //   parentNode: gridElement_merge_table,
+    //     data: new_table
+    // });
+    //  grid_merge_table.style.height = '300px';
+    // grid_merge_table.style.width = '100%';
+
+
+
+
+
+            const merge_button = document.getElementById("merge_button");
+            columns_new =[]
+            columns_merge = []
+
             // Return the merged table and add to the document id and pass as post to merge table again
 
 //
@@ -140,31 +193,71 @@
 //     });
 
 
-    grid_new_table.addEventListener('click', function (e) {
-      if (!e.cell) return;
-      grid_new_table.data[0][grid_new_table.schema[0].name] = 'Clicked on ' + e.cell.value;
-    })
+            // grid_new_table.addEventListener('click', function (e) {
+            //     if (!e.cell) return;
+            //     grid_new_table.data[0][grid_new_table.schema[0].name] = 'Clicked on ' + e.cell.value;
+            //     columns_new = e.cell.value;
+            //     console.log(columns_new)
+            // })
 
-    app_new_table.append(gridElement_new_table);
+            // app_new_table.append(gridElement_new_table);
 
-    //
-    // const app_merge_table = document.getElementById('app1');
-    // const gridElement_merge_table = document.createElement('div');
-    // const grid_merge_table = canvasDatagrid({
-    //   parentNode: gridElement_merge_table,
-    //   data,
-    // });
-
-
-    grid_merge_table.addEventListener('click', function (e) {
-      if (!e.cell) return;
-      grid_merge_table.data[0][grid_merge_table.schema[0].name] = 'Clicked on ' + e.cell.value;
-    })
-
-    app_merge_table.append(gridElement_merge_table);
+            //
+            // const app_merge_table = document.getElementById('app1');
+            // const gridElement_merge_table = document.createElement('div');
+            // const grid_merge_table = canvasDatagrid({
+            //   parentNode: gridElement_merge_table,
+            //   data,
+            // });
 
 
+            ;
+            // console.log(columns_new, columns_merge)
 
+             merge_button.addEventListener('click', async ()=>{
+                console.log("clicked")
+
+                const response = await fetch("{{url_for('merge_data')}}",{
+                    method:"POST",
+                    headers:{
+                        "Content-Type": "application/json; charset=utf-8",
+                    },
+                    body:JSON.stringify({
+                        new_table: {{new_table_df | tojson}},
+                        columns_new:columns_new,
+                        columns_merge:columns_merge})
+                })
+                // console.log((await response.arrayBuffer().byteLength))
+                const data = (await response.json());
+                console.log(data)
+                // console.log(XLSX)
+                grid_merge_table.data = Array.isArray(data) ? data : Object.values(data)
+                // const workbook = XLSX.read(data);
+                // const worksheet = workbook.Sheets[workbook.sheetNames[0]]
+                // const merge_sheet_data = XLSX.utils.sheet_to_json(worksheet)
+                // console.log(merge_sheet_data)
+            })
+            grid_merge_table.addEventListener('click', function (e) {
+                if (!e.cell) return;
+                grid_merge_table.data[0][grid_merge_table.schema[0].name] =  e.cell.value;
+                columns_merge = e.cell.value;
+                console.log(columns_merge)
+
+            })
+
+            // app_merge_table.append(gridElement_merge_table)
+
+
+
+    // 1. Your raw data as a literal string
+
+new gridjs.Grid({
+
+                    data: finalDictionaryArray
+
+            }).render(document.getElementById('gridjs'))
+//     console.log(decodeURIComponent("{{merge_table_df}}"))
+// // Set value from column to the dat component
 
 </script>
 
