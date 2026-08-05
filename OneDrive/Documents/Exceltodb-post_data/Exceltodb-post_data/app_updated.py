@@ -77,6 +77,7 @@ def merge_data():
         # filename = read_write(data)
         # print(filename)
         #
+        new_table = ''
         columns_new = request.json['columns_new']
         columns_merge = request.json['columns_merge']
         new_table = request.json['new_table']

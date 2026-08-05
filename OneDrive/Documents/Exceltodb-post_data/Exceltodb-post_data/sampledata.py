@@ -25,7 +25,7 @@ from database import insert_data, get_data
 # # insert_data(df4, "products")
 #Data frame and new and merged table columns mapping
 column_mapping = [[''],['']]
-def read_write(data, columns_mapping=column_mapping):
+def read_write(data, column_mappings):
     # list = os.listdir(os.path.join("./sample"))
     # dic = {
     #
@@ -47,7 +47,7 @@ def read_write(data, columns_mapping=column_mapping):
     # merged_df = pd.DataFrame(['id'])
     # Concat tables
     merged_df = pd.read_excel(os.path.join("./output",'output.xlsx'))
-    column_mappings = [[''],['']]
+    # column_mappings = [[''],['']]
     print("Data Type", type(data))
     data = json.loads(data)
     print("data",type(data))
@@ -131,13 +131,19 @@ def read_write(data, columns_mapping=column_mapping):
 #
 #     # index = df_merge3['customer_id, customer_name,      city,  order_id,  order_date,  product_id, quantity, product_name,     category,                  remarks ']
 #     df_cleaned = merged_df[0].loc[:, ~merged_df[0].columns.duplicated()]
-    filename = "output.xlsx"
+    merged_df.fillna(value='0', inplace=True, )
+    try:
+        filename = "output.xlsx"
 #     # pr
 #     df_cleaned.drop_duplicates()
 #     df_cleaned.to_excel(os.path.join("./output/",filename), index=False)
-    merged_df.to_excel(os.path.join("./output/",filename), index=False)
+        merged_df.to_excel(os.path.join("./output/",filename), index=False)
 
-    insert_data(merged_df, "Full Table final test 1")
+        insert_data(merged_df, "Full Table final test 2")
+
+    except:
+        raise ValueError("Table not saved")
+
     return merged_df, filename
 #
 # data = pd.read_excel(os.path.join("./files", 'products.xlsx'))
