@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, send_from_directory, Response, redirect, url_for, send_file
+from flask import Flask, request, jsonify, render_template, send_from_directory, Response, redirect, url_for, send_file, session
 
 from files import readfile_write, create_first_output
 import pandas as pd
@@ -7,6 +7,7 @@ import os
 import openpyxl
 from sampledata import read_write
 from files import merge_file
+from database import insert_data
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/')
 
 # api
@@ -17,17 +18,30 @@ app = Flask(__name__, template_folder='templates', static_folder='static', stati
 # row id *
 # Check json values according to columns and rows
 # Remove extra unnamed indexes
+app.secret_key = 'your_secret_key_here'
+
+@app.route('/upload-db', methods=['POST'])
+def upload_db():
+    if request.method == 'POST':
+        db_file = request.files['file']
+        session['db'] = db_file.filename
+        db_file.save(os.path.join("./database", db_file.filename))
+        return render_template("indexlayout.html", db_file=db_file.filename or '',merge_table_df={}, new_table_df={})
+
+
 
 @app.route("/", methods=['GET'])
 def index():
     if request.method == 'GET':
         # get data for merged table
         # Gwt data m db
+        session['db'] = ''
         if os.path.isfile("./output/output.xlsx") == False:
             create_first_output()
         merge_table_df = pd.read_excel(os.path.join("./output", "output.xlsx"))
         merge_table_df = merge_table_df.to_dict()
-        return render_template('indexlayout.html', merge_table_df=merge_table_df, new_table_df={})
+        db = session.get('db')
+        return render_template('indexlayout.html', merge_table_df=merge_table_df, new_table_df={}, db_file=db)
 # Add the column wise table view for each file
 @app.route('/data', methods=['GET','POST'])
 def receive_data():
@@ -51,10 +65,11 @@ def receive_data():
         merge_table_df = pd.read_excel(os.path.join("./output", "output.xlsx"))
         merge_table_columns = merge_table_df.columns.tolist()
         print("Merged Table Columns",merge_table_columns)
+        db = session.get('db')
         # status = True
         # second time return columns of the previous merged table and new table
         if status:
-            return render_template("indexlayout.html", new_table = new_table or {}, new_table_df=table_json, merged_table_columns=merge_table_columns, merge_table_df=merge_table_df.to_dict())
+            return render_template("indexlayout.html", new_table = new_table or {}, new_table_df=table_json, merged_table_columns=merge_table_columns, merge_table_df=merge_table_df.to_dict(), db_file = db)
         else:
             return render_template("indexlayout.html", message = "Please select .xlsx file")
         # filelist = os.path.
@@ -125,5 +140,17 @@ def merge_data():
 def download_output_file():
     if request.method == 'GET':
         return send_from_directory('./output', 'output.xlsx', download_name="output.xslx")
+
+@app.route('/to-sql/<db_file>', methods=['GET', 'POST'])
+def to_sql(db_file):
+    print(db_file)
+    if request.method == 'POST':
+        excel_file = request.json['file']
+        # df = pd.read_excel(excel_file)
+        df = pd.DataFrame.from_dict(excel_file)
+        print("To Sql Values", excel_file)
+        insert_data(df, "Full Table final", db_file)
+        return Response('Added To Database')
+
 if __name__ == '__main__':
     app.run(debug=True)

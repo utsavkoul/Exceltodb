@@ -129,22 +129,27 @@ def read_write(data, column_mappings):
 #     # df_merge4 = df_merge3.drop_duplicates()
 #     # # print(df_merge3)
 #
+    merged_df_string = merged_df.convert_dtypes(convert_string=True, convert_integer=True )
+    print(merged_df_string)
+    print(merged_df_string.dtypes)
 #     # index = df_merge3['customer_id, customer_name,      city,  order_id,  order_date,  product_id, quantity, product_name,     category,                  remarks ']
 #     df_cleaned = merged_df[0].loc[:, ~merged_df[0].columns.duplicated()]
-    merged_df.fillna(value='0', inplace=True, )
+    fillna_mappings = merged_df_string.dtypes.replace({'Int64': 0, 'string': 'NONE'})
+    merged_df_string.fillna(fillna_mappings,  inplace=True )
+    print(merged_df_string)
     try:
         filename = "output.xlsx"
 #     # pr
 #     df_cleaned.drop_duplicates()
 #     df_cleaned.to_excel(os.path.join("./output/",filename), index=False)
-        merged_df.to_excel(os.path.join("./output/",filename), index=False)
+        merged_df_string.to_excel(os.path.join("./output/",filename), index=False)
 
-        insert_data(merged_df, "Full Table final test 2")
+        insert_data(merged_df_string, "Full Table final ")
 
-    except:
-        raise ValueError("Table not saved")
+    except Exception as e:
+        print(e)
 
-    return merged_df, filename
+    return merged_df_string, filename
 #
 # data = pd.read_excel(os.path.join("./files", 'products.xlsx'))
 # print(read_write(data))

@@ -1,6 +1,7 @@
 {% extends 'base.html'%}
 <body>
 {% block content %}
+
 <div class="card grid " style="width: 600.8px;display: flex;">
     <div class="card-body g-col-2" style="width: 450px; display: inline;">
 
@@ -12,8 +13,9 @@
             <div class="form-group" style=""><label>Merge Table Columns</label><select class="form-control">
                 {% for column in merged_table_columns%}
                 <option value="value1">{{ column }}</option>
-                <option value="value1">NONE </option>
+
                 {% endfor %}
+             <option value="value1">NONE </option>
             </select>
             </div>
                 <div class="form-group"><label>New Table Columns</label><select class="form-control">
@@ -72,9 +74,11 @@
     </div>
 </div>
 <div class="card" style="width: 600.8px;">
-    <div class="card-body g-col-2" style="width: 450px; display: inline;"><h4 class="card-title">Table</h4>
+    <div class="card-body g-col-2" style="width: 450px; display: inline;"><h4 class="card-title">Merged Table   <button><a href={{url_for('download_output_file')}}><i class="fa fa-download "> </i></a></button></h4>
+
         <div id="app1"></div>
     </div>
+    <button class="btn btn-primary" id="tosql" >To Database</button>
 </div>
 
 <!--<div class="card" style="width: 600.8px;">-->
@@ -83,8 +87,11 @@
 <!--    </div>-->
 <!--</div>-->
 
+{% set db_file_py = db_file %}
+<!--create a download button and download excel file and display only head of the dataframe fix the column selection-->
 <script>
     console.log(decodeURIComponent());
+
 // const rawString = '{{merge_table_df | tojson}}'
 //
 // // 2. Fix single quotes to double quotes so JSON.parse can read it
@@ -245,8 +252,16 @@ const new_table = toArrayOfObjects('{{new_table_df | tojson}}')
             })
 
             app_merge_table.append(gridElement_merge_table)
-
-
+            db_file = '{{db_file_py | string()}}'
+            tosql_button = document.getElementById('tosql');
+            tosql_button.addEventListener('click', ()=>{
+            const response = fetch('{{url_for('to_sql', db_file = db_file_py) }}', {
+                method:'POST',
+                headers:{'Content-Type':'application/json;  charset=utf-8;'},
+                body: JSON.stringify({file:merge_table})
+            })
+            console.log(response)
+        })
 
     // 1. Your raw data as a literal string
 

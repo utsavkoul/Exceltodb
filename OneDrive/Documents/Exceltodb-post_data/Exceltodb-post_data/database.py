@@ -1,11 +1,11 @@
 import sqlite3
 from sqlalchemy import create_engine
+from pathlib import Path
 
 
+# engine = create_engine('sqlite:///database.db')
 
-engine = create_engine('sqlite:///database.db')
-
-
+# engine = create_engine('sqlite:///'+'database/'+db_file.filename)
 
 
 # cursor.execute('SELECT * FROM data')
@@ -17,9 +17,14 @@ engine = create_engine('sqlite:///database.db')
 
 
 
-def insert_data(df, tablename):
-    df.to_sql(tablename, con=engine, if_exists='append', index=False)
-
+def insert_data(df, tablename, db):
+    path = Path("./database")
+    if any(path.iterdir()):
+        engine = create_engine('sqlite:///' + 'database/' + db)
+        print(engine)
+        df.to_sql(tablename, con=engine, if_exists='append', index=False)
+    else:
+        return "No Database File"
 
 
 

@@ -25,8 +25,18 @@
 <script src="https://unpkg.com/canvas-datagrid"></script>
 <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <!-- use xlsx.full.min.js from version 0.20.3 -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<div class="card  top-0  position-absolute grid " style=" height: 30%; width: 100%;">
+<div class="card card-text position-absolute g-col-2 top-0 " style="height: 100%; width: 50%; display: inline;">
+    <form method="POST" action="{{url_for('upload_db')}}" enctype="multipart/form-data" >
+    <label>Upload DB File</label><input type="file" class="form-control" name="file" accept=".db, .sqlite, .sqlite3, application/octet-stream">
+    <button type="submit" class="btn btn-primary">Upload DB File</button>
+    </form>
+</div>
+<div class="card card-text position-absolute g-col-2 top-0 " style="height: 100%; width: 50%; display: inline; margin-left: 50%;"></div>
+</div>
 <div class="card-body  card-text grid position-absolute top-50 start-50 translate-middle" style= "display: flex;" >
 
 {% block content %}{% endblock %}

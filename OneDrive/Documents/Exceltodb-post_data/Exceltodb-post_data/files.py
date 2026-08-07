@@ -5,10 +5,10 @@ from database import insert_data
 import uuid
 from database import insert_dictionary
 from sampledata import read_write
-dictionary = {
-
-        }
-count = 0
+# dictionary = {
+#
+#         }
+# count = 0
 def readfile_write(file):
     # for file in files:
     #     count = 0
