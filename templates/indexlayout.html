@@ -1,0 +1,398 @@
+{% extends 'base.html'%}
+<body>
+{% block content %}
+
+<div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Menu</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close" title="Close menu" style="align-items: center;">
+</button>
+  </div>
+  <div class="offcanvas-body">
+
+
+      <div class=" g-col-2 top-0 row" style="height: 100%; width: 50%; display: inline;">
+    <form  method="post" action="{{ url_for('upload_db') }}" enctype="multipart/form-data" >
+    <label>Upload DB File</label><input id="file" type="file" class="form-control" name="file" accept=".db, .sqlite, .sqlite3, application/octet-stream">
+
+        <div class="form-group g-col-2 top-0">
+            <label for="table_name">DB Columns</label>
+            <select name="table_name" class="form-control form-group" id="table_name">
+
+        <option value="NONE" selected>NONE </option>
+                </select>
+        </div>
+    <button id="upload_db" type="submit" class="btn btn-primary">Upload DB File</button>
+    </form>
+
+<div class=" g-col-2 row" style="width: 450px; height: 100%; display: inline;">
+
+
+</div>
+    <div class=" g-col-2 row" style="width: 450px; display: inline;">
+
+        <h4 class="card-title">FILE</h4>
+        <div class="form-group" >
+            <form method="POST" action="{{url_for("receive_data")}}" enctype="multipart/form-data" >
+            <div>
+            <label>Upload File</label><input type="file" class="form-control" name="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv">
+
+                <div class="form-group"><label>New Table Columns</label>
+                    <select class="form-control" id="new_table_column">
+                    {% for column in new_table %}
+                    <option  value="{{column}}">{{ column }}</option>
+                    {% endfor %}
+                        <option value="NONE" selected>NONE </option>
+                </select>
+                </div>
+                </div>
+            <div class="form-group" style=""><label>Merge Table Columns</label>
+                <select class="form-control" id="merged_table_column">
+                {% for column in merged_table_columns %}
+                <option value="{{column}}">{{ column }}</option>
+
+                {% endfor %}
+             <option value="NONE" selected>NONE </option>
+            </select>
+            </div>
+            <button href="{{ url_for('receive_data')}}" type="submit" class="btn btn-primary" >Upload</button>
+            <button type="button" class="btn btn-primary" id="merge_button" style="">Merge Table</button>
+            </form>
+            </div>
+
+
+        </div>
+
+  </div>
+</div>
+</div>
+
+
+
+
+
+
+<!-- /container -->
+
+<!-- Add excel grid component-->
+<div class="page-shell">
+    <div class="table-grid">
+        <div class="card index-table-card">
+            <h4 class="card-title">Table</h4>
+            <div class="card-body g-col-2">
+                <div id="app"></div>
+            </div>
+        </div>
+        <div class="card index-table-card">
+            <h4 class="card-title">Merged Table   <button><a href={{url_for('download_output_file')}}><i class="fa fa-download "> </i></a></button></h4>
+            <div class="card-body g-col-2">
+                <div id="app1"></div>
+            </div>
+            <button class="btn btn-primary" id="tosql" >To Database</button>
+        </div>
+    </div>
+</div>
+
+<!--<div class="card" style="width: 600.8px;">-->
+<!--    <div class="card-body g-col-2" style="width: 450px; display: inline;"><h4 class="card-title">Table</h4>-->
+<!--        <div id="gridjs"></div>-->
+<!--    </div>-->
+<!--</div>-->
+
+{% set db_file_py = db_file %}
+<!--create a download button and download excel file and display only head of the dataframe fix the column selection-->
+<script>
+    console.log(decodeURIComponent());
+
+// const rawString = '{{merge_table_df | tojson}}'
+//
+// // 2. Fix single quotes to double quotes so JSON.parse can read it
+//
+//
+// // 3. Parse the string into a temporary working object
+// const parsedData = JSON.parse(String(rawString));
+// console.log("Parsed Data",parsedData)
+//
+// // 4. Map the data into a clean array of dictionary objects
+// const finalDictionaryArray = Object.keys(parsedData.customer_id).map(index => {
+//   return {
+//     customer_id: parsedData.customer_id[index],
+//     customer_name: parsedData.customer_name[index],
+//     city: parsedData.city[index]
+//   };
+// });
+//
+// console.log("Final Dictionary Table",finalDictionaryArray);
+    let db_file = document.getElementById("file");
+    const table_names = document.getElementById('table_name');
+    // db_file.addEventListener('change', async function (e) {
+    //         console.log(e)
+    //         const file = e.target.files[0];
+    //         if (!file) return;
+    //
+    //         try {
+    //             // Read file as ArrayBuffer
+    //             const arrayBuffer = await file.arrayBuffer();
+    //
+    //             // Load DB into sql.js
+    //             const db = new SQL.Database(new Uint8Array(arrayBuffer));
+    //
+    //             // Example: Get all table names
+    //             const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table'");
+    //             console.log(tables)
+    //             table_names.innerText = tables[0].values.map(row => row[0]).join(', ');
+    //
+    //         } catch (error) {
+    //             console.error("Error reading DB file:", error);
+    //         }
+    //     }
+    // )
+
+     initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` })
+        .then(SQL => {
+            document.getElementById('file').addEventListener('change', async (event) => {
+                file = event.target.files[0];
+                console.log(file);
+                if (!file) return;
+
+                try {
+                    // Read file as ArrayBuffer
+                    const arrayBuffer = await file.arrayBuffer();
+
+                    // Load DB into sql.js
+                    const db = new SQL.Database(new Uint8Array(arrayBuffer));
+
+                    // Example: Get all table names
+                    const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table'");
+                    // tables[1].forEach(table=> console.log(table))
+                    console.log(tables[0].values);
+                    table_names.innerHTML = tables[0].values.map(row => `<option id="table_names_html" value="${row[0]}">${row[0]}</option>`).join('');
+
+
+                } catch (err) {
+                    console.log("Error: " + err.message);
+                }
+            });
+        });
+
+
+
+
+        table_names.addEventListener('click', function (e) {
+            console.log(e.target.value)
+            table_name = e.target.value
+
+        })
+
+
+        const new_table_column = document.getElementById('new_table_column');
+        new_table_column.addEventListener('click', function (e) {
+            console.log(e.target.value)
+            columns_new = e.target.value
+        })
+        const merge_table_column = document.getElementById('merged_table_column');
+        merge_table_column.addEventListener('click', function (e) {
+            console.log(e.target.value)
+            columns_merge = e.target.value
+        })
+
+
+    //     const rows = Object.values({
+    //     {
+    //         new_table_df | tojson
+    //     }
+    // })
+    //     ;
+
+        /**
+         * Automatically converts any pandas-style string into a custom dictionary.
+         * @param {string} stringData - The raw string input.
+         * @param {string} keyField - The column name you want to use as your dictionary key.
+         * @returns {Object} A dynamic custom dictionary.
+         */
+        function toArrayOfObjects(stringData, keyField = null) {
+            const parsedData =
+                typeof stringData === "string"
+                    ? JSON.parse(stringData)
+                    : stringData;
+
+            const columns = Object.keys(parsedData);
+
+            if (columns.length === 0) return [];
+
+            const rowIndexes = Object.keys(parsedData[columns[0]]);
+
+            return rowIndexes.map(index => {
+                const row = {};
+
+                columns.forEach(col => {
+                    row[col] = parsedData[col][index];
+                });
+
+                if (keyField && parsedData[keyField]) {
+                    row._key = parsedData[keyField][index];
+                }
+
+                return row;
+            });
+        }
+
+        const new_table = toArrayOfObjects('{{new_table_df | tojson}}')
+        console.log("New Table", new_table)
+        const merge_table = toArrayOfObjects('{{merge_table_df | tojson}}')
+        console.log("Merge Table", merge_table)
+        const app_new_table = document.getElementById('app');
+        const gridElement_new_table = document.createElement('div');
+        const grid_new_table = canvasDatagrid({
+            parentNode: gridElement_new_table,
+            data: new_table
+        });
+        grid_new_table.style.height = '300px';
+        grid_new_table.style.width = '100%';
+
+        const app_merge_table = document.getElementById('app1');
+        const gridElement_merge_table = document.createElement('div');
+        // normalize server data into an array of row objects
+        const _merge_raw = decodeURIComponent({{merge_table_df | tojson}});
+        const _merge_rows = Array.isArray(_merge_raw) ? _merge_raw : Object.values(_merge_raw);
+        const grid_merge_table = canvasDatagrid({
+            parentNode: gridElement_merge_table,
+            data: merge_table
+        });
+        grid_merge_table.style.height = '300px';
+        grid_merge_table.style.width = '100%';
+
+
+        // const upload_db_button = document.getElementById("upload_db");
+        // upload_db_button.addEventListener('click', async () => {
+        //
+        //     // file = document.getElementById("file").files[0];
+        //     console.log(file)
+        //     console.log("clicked")
+        //     console.log(table_name)
+        //     const response = await fetch(`{{url_for('upload_db')}}`, {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json; charset=utf-8",
+        //         },
+        //         body:{
+        //             table_name: table_name,
+        //             db_file: file
+        //         }
+        //     })
+        //     const data = (await response.json());
+        //     console.log(data)
+        // }
+        // )
+
+
+        const merge_button = document.getElementById("merge_button");
+        columns_new = []
+        columns_merge = []
+
+        // Return the merged table and add to the document id and pass as post to merge table again
+
+//
+// var data =
+//
+//
+//     [
+//   { "col1": "foo\nbar", "col2": 0, "col3": "a" },
+//   { "col1": "bar\nfoo\nbar", "col2": 1, "col3": "b" },
+//   { "col1": "baz\nfoo\nbar", "col2": 2, "col3": "c" }
+// ]
+//     const rows = Object.values({{new_table_df | tojson}});
+//     console.log(rows);
+//     const app_new_table = document.getElementById('app');
+//     const gridElement_new_table = document.createElement('div');
+//     const grid_new_table = canvasDatagrid({
+//       parentNode: gridElement_new_table,
+//     data: rows,
+//     });
+
+
+        grid_new_table.addEventListener('click', function (e) {
+            if (!e.cell) return;
+            grid_new_table.data[0][grid_new_table.schema[0].name] = 'Clicked on ' + e.cell.value;
+            columns_new = e.cell.value;
+            new_table_column.value = columns_new
+
+            console.log(columns_new)
+        })
+
+        app_new_table.append(gridElement_new_table);
+
+        // //
+        // const app_merge_table = document.getElementById('app1');
+        // const gridElement_merge_table = document.createElement('div');
+        // const grid_merge_table = canvasDatagrid({
+        //   parentNode: gridElement_merge_table,
+        //   data,
+        // });
+
+
+
+        // console.log(columns_new, columns_merge)
+
+        merge_button.addEventListener('click', async () => {
+            console.log("clicked")
+
+            const response = await fetch("{{url_for('merge_data')}}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                },
+                body: JSON.stringify({
+                    new_table: '{{new_table_df | tojson}}',
+                    columns_new: columns_new,
+                    columns_merge: columns_merge
+                })
+            })
+            // console.log((await response.arrayBuffer().byteLength))
+            const data = (await response.json());
+            console.log(data)
+            // console.log(XLSX)
+            merged_table = toArrayOfObjects(data)
+            grid_merge_table.data = merged_table
+            // const workbook = XLSX.read(data);
+            // const worksheet = workbook.Sheets[workbook.sheetNames[0]]
+            // const merge_sheet_data = XLSX.utils.sheet_to_json(worksheet)
+            // console.log(merge_sheet_data)
+        })
+        grid_merge_table.addEventListener('click', function (e) {
+            if (!e.cell) return;
+            grid_merge_table.data[0][grid_merge_table.schema[0].name] = e.cell.value;
+            columns_merge = e.cell.value;
+            merge_table_column.value = columns_merge
+            console.log(columns_merge)
+
+        })
+
+        app_merge_table.append(gridElement_merge_table)
+        // db_file = '{{db_file_py | string()}}'
+        tosql_button = document.getElementById('tosql');
+        tosql_button.addEventListener('click', () => {
+            const response = fetch("{{url_for('to_sql', db_file = db_file) }}", {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json;  charset=utf-8;'},
+                body: JSON.stringify({file: merge_table})
+            }
+        )
+            console.log(response)
+        })
+
+
+    // 1. Your raw data as a literal string
+
+// new gridjs.Grid({
+//
+//                     data: finalDictionaryArray
+//
+//             }).render(document.getElementById('gridjs'))
+//     console.log(decodeURIComponent("{{merge_table_df}}"))
+// // Set value from column to the dat component
+
+</script>
+
+{% endblock %}
+</body>
